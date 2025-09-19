@@ -1,18 +1,24 @@
 import os
 import getpass
 import socket
+import shlex
 
-def expand_env_variables(command):
-    parts = command.split()
-    expanded_parts = []
-    for part in parts:
-        if part.startswith('$'):
-            var = part[1:]
-            expanded = os.environ.get(var, '')
-            expanded_parts.append(expanded)
-        else:
-            expanded_parts.append(part)
-    return ' '.join(expanded_parts)
+HOME = os.path.expanduser("~")
+def expand_vars(args):
+    expanded = []
+    for arg in args:
+        arg = os.path.expandvars(arg)   # раскрыть переменные $VAR
+        arg = os.path.expanduser(arg)   # раскрыть ~
+        expanded.append(arg)
+    return expanded
+
+def parcer(command):
+    # Разбиваем команду на аргументы с поддержкой кавычек
+    parts = shlex.split(command)
+    # Раскрываем переменные окружения вида $VAR и ${VAR} в каждом аргументе
+    expanded = [os.path.expandvars(part) for part in parts]
+    return expanded
+
 
 def main():
     username = getpass.getuser()
@@ -25,14 +31,13 @@ def main():
             user_input = input(prompt)
         except:
             break
-        # Раскрытие переменных окружения
-        command_line = expand_env_variables(user_input)
-        parts = command_line.strip().split()
-        if not parts:
-            continue
-
+        # Получаем список аргументов
+        parts = parcer(user_input)
         cmd = parts[0]
         args = parts[1:]
+
+        # Раскрываем переменные в аргументах
+        args = expand_vars(args)
 
         if cmd == 'exit':
             print("Exit.")
@@ -41,8 +46,12 @@ def main():
             print(f"Command: ls, Arguments: {args}")
         elif cmd == 'cd':
             print(f"Command: cd, Arguments: {args}")
+        elif cmd == '$HOME':
+            print(HOME)
+
         else:
             print(f"Unknown command: {cmd}")
+
 
 if __name__ == "__main__":
     main()
