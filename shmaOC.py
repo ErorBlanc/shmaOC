@@ -23,13 +23,8 @@ def main():
         prompt = f"{username}@{hostname}:{cwd}$ "
         try:
             user_input = input(prompt)
-        except EOFError:
-            print()
+        except:
             break
-
-        if not user_input.strip():
-            continue
-
         # Раскрытие переменных окружения
         command_line = expand_env_variables(user_input)
         parts = command_line.strip().split()
@@ -46,7 +41,6 @@ def main():
             print(f"Command: ls, Arguments: {args}")
         elif cmd == 'cd':
             print(f"Command: cd, Arguments: {args}")
-            # Для демонстрации не меняем каталог, только заглушка
         else:
             print(f"Unknown command: {cmd}")
 
