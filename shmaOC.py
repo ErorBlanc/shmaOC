@@ -38,7 +38,6 @@ def commands(cmd, args, show_prompt=True):
         print(" ".join(args))
     else:
         print(f"Unknown command: {cmd}")
-
 def main():
     username = getpass.getuser() #получение имени пользователя
     hostname = socket.gethostname() #получение имени хоста - компьютера
